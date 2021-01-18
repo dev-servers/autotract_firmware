@@ -6,9 +6,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(STM32_CUBE_F4_PATH libs/stm32cube)
 find_package(CMSIS COMPONENTS STM32F4 REQUIRED)
 find_package(HAL COMPONENTS STM32F4 REQUIRED)
+set(SOURCE_FILES src/main.cpp src/interrupts.cpp src/rosserial.cpp src/init.cpp src/errors.cpp src/steering.cpp src/stepper.cpp src/encoder.cpp libs/ros/time.cpp)
 
 # Nucleo STM32F412ZG 
-add_executable(nucleo_firmware.elf src/main.cpp src/interrupts.cpp src/init.cpp src/errors.cpp libs/ros/time.cpp inc/stm32f4xx_hal_conf.h)
+add_executable(nucleo_firmware.elf ${SOURCE_FILES})
 target_compile_features(nucleo_firmware.elf  PUBLIC cxx_std_17)
 target_include_directories(
     nucleo_firmware.elf
@@ -28,7 +29,7 @@ target_link_libraries(nucleo_firmware.elf
 target_compile_definitions(nucleo_firmware.elf PUBLIC NUCLEO)
 
 # BlackPill STM32F411CE
-add_executable(blackpill_firmware.elf src/main.cpp src/interrupts.cpp src/init.cpp src/errors.cpp libs/ros/time.cpp inc/stm32f4xx_hal_conf.h)
+add_executable(blackpill_firmware.elf ${SOURCE_FILES})
 
 target_compile_features(blackpill_firmware.elf  PUBLIC cxx_std_17)
 target_include_directories(

@@ -3,8 +3,7 @@
 void init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
                DMA_HandleTypeDef *txdma, USART_TypeDef *usart_inst,
                DMA_Stream_TypeDef *rxdma_inst, DMA_Stream_TypeDef *txdma_inst,
-               uint32_t rx_channel, uint32_t tx_channel)
-{
+               uint32_t rx_channel, uint32_t tx_channel) {
 
     assert_param(IS_DMA_CHANNEL(rx_channel));
     assert_param(IS_DMA_CHANNEL(tx_channel));
@@ -34,7 +33,6 @@ void init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
     rxdma->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     rxdma->Init.MemInc = DMA_MINC_ENABLE;
     rxdma->Init.PeriphInc = DMA_PINC_DISABLE;
-    rxdma->Parent = handle;
 
     // TX DMA Channel config
     txdma->Instance = txdma_inst;
@@ -45,10 +43,11 @@ void init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
     txdma->Init.PeriphDataAlignment = DMA_PDATAALIGN_BYTE;
     txdma->Init.MemInc = DMA_MINC_ENABLE;
     txdma->Init.PeriphInc = DMA_PINC_DISABLE;
-    txdma->Parent = handle;
+    txdma->Init.Priority = DMA_PRIORITY_LOW;
+    txdma->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 
     // USART config
-    handle->Init.BaudRate = 57600;
+    handle->Init.BaudRate = 115200;
     handle->Init.WordLength = UART_WORDLENGTH_8B;
     handle->Init.Mode = UART_MODE_TX_RX;
     handle->Init.Parity = UART_PARITY_NONE;
@@ -56,37 +55,35 @@ void init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
     handle->Init.WordLength = UART_WORDLENGTH_8B;
     handle->Init.HwFlowCtl = UART_HWCONTROL_NONE;
     handle->Init.OverSampling = UART_OVERSAMPLING_16;
-    handle->hdmarx = rxdma;
-    handle->hdmatx = txdma;
     handle->Instance = usart_inst;
 
     // Init all
-    volatile HAL_StatusTypeDef s;
+    HAL_StatusTypeDef s;
     s = HAL_DMA_Init(rxdma);
-    if (s != HAL_OK)
-    {
+    if (s != HAL_OK) {
         Error_Handler();
     }
     s = HAL_DMA_Init(txdma);
-    if (s != HAL_OK)
-    {
+    if (s != HAL_OK) {
         Error_Handler();
     }
+    txdma->Parent = handle;
+    rxdma->Parent = handle;
+    handle->hdmarx = rxdma;
+    handle->hdmatx = txdma;
     s = HAL_UART_Init(handle);
-    if (s != HAL_OK)
-    {
+    if (s != HAL_OK) {
         Error_Handler();
     }
     HAL_NVIC_SetPriority(ROSSERIAL_UART_RXDMA_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(ROSSERIAL_UART_RXDMA_IRQn);
-    HAL_NVIC_SetPriority(ROSSERIAL_UART_TXDMA_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(ROSSERIAL_UART_TXDMA_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(ROSSERIAL_UART_TXDMA_IRQn);
-    HAL_NVIC_SetPriority(ROSSERIAL_UART_IRQn, 0, 1);
+    HAL_NVIC_SetPriority(ROSSERIAL_UART_IRQn, 0, 0);
     HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
 }
 
-void init_gpio()
-{
+void init_gpio() {
     GPIO_InitTypeDef GPIO_Config;
     // Init SWD
     SWD_PORT_CLK_EN();
@@ -103,8 +100,7 @@ void init_gpio()
     HAL_GPIO_Init(STATUS_LED_PORT, &GPIO_Config);
 }
 #ifdef NUCLEO
-void init_clocks()
-{
+void init_clocks() {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -125,8 +121,7 @@ void init_clocks()
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
     RCC_OscInitStruct.PLL.PLLQ = 2;
     RCC_OscInitStruct.PLL.PLLR = 2;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         Error_Handler();
     }
     /** Initializes the CPU, AHB and APB buses clocks
@@ -138,15 +133,13 @@ void init_clocks()
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-    {
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
         Error_Handler();
     }
 }
 #endif
 #ifdef BLACKPILL
-void init_clocks()
-{
+void init_clocks() {
     RCC_OscInitTypeDef RCC_OscInitStruct = {0};
     RCC_ClkInitTypeDef RCC_ClkInitStruct = {0};
 
@@ -166,8 +159,7 @@ void init_clocks()
     RCC_OscInitStruct.PLL.PLLN = 200;
     RCC_OscInitStruct.PLL.PLLP = RCC_PLLP_DIV2;
     RCC_OscInitStruct.PLL.PLLQ = 4;
-    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK)
-    {
+    if (HAL_RCC_OscConfig(&RCC_OscInitStruct) != HAL_OK) {
         Error_Handler();
     }
     /** Initializes the CPU, AHB and APB buses clocks
@@ -179,8 +171,7 @@ void init_clocks()
     RCC_ClkInitStruct.APB1CLKDivider = RCC_HCLK_DIV2;
     RCC_ClkInitStruct.APB2CLKDivider = RCC_HCLK_DIV1;
 
-    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK)
-    {
+    if (HAL_RCC_ClockConfig(&RCC_ClkInitStruct, FLASH_LATENCY_3) != HAL_OK) {
         Error_Handler();
     }
 }

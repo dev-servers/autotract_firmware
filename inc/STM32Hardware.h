@@ -53,7 +53,7 @@ extern UART_HandleTypeDef rosserial_handle;
 
 class STM32Hardware {
   protected:
-    UART_HandleTypeDef* huart;
+    UART_HandleTypeDef *huart;
 
     const static uint16_t rbuflen = 512;
     uint8_t rbuf[rbuflen];
@@ -62,14 +62,14 @@ class STM32Hardware {
         return (rbuflen - __HAL_DMA_GET_COUNTER(huart->hdmarx)) & (rbuflen - 1);
     }
 
-    const static uint16_t tbuflen = 512;
+    const static uint32_t tbuflen = 512;
     uint8_t tbuf[tbuflen];
     uint32_t twind, tfind;
 
   public:
     STM32Hardware() : huart(&rosserial_handle), rind(0), twind(0), tfind(0) {}
 
-    STM32Hardware(UART_HandleTypeDef* huart_)
+    STM32Hardware(UART_HandleTypeDef *huart_)
         : huart(huart_), rind(0), twind(0), tfind(0) {}
 
     void init() { reset_rbuf(); }
@@ -100,8 +100,10 @@ class STM32Hardware {
         }
     }
 
-    void write(uint8_t* data, int length) {
+    void write(uint8_t *data, int length) {
         int n = length;
+        // int tbuflen = this->tbuflen; // possible overflow
+        // int twind = this->twind;     // possible overflow
         n = n <= tbuflen ? n : tbuflen;
 
         int n_tail = n <= tbuflen - twind ? n : tbuflen - twind;
