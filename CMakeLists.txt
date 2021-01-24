@@ -6,7 +6,17 @@ set(CMAKE_INCLUDE_CURRENT_DIR TRUE)
 set(STM32_CUBE_F4_PATH libs/stm32cube)
 find_package(CMSIS COMPONENTS STM32F4 REQUIRED)
 find_package(HAL COMPONENTS STM32F4 REQUIRED)
-set(SOURCE_FILES src/main.cpp src/interrupts.cpp src/rosserial.cpp src/init.cpp src/errors.cpp src/steering.cpp src/stepper.cpp src/encoder.cpp libs/ros/time.cpp)
+set(SOURCE_FILES 
+src/main.cpp 
+src/app.cpp
+src/interrupts.cpp
+src/errors.cpp  
+src/hardware.cpp 
+src/rosserial.cpp 
+src/steering.cpp 
+src/stepper.cpp 
+src/encoder.cpp 
+libs/ros/time.cpp)
 
 # Nucleo STM32F412ZG 
 add_executable(nucleo_firmware.elf ${SOURCE_FILES})
@@ -19,6 +29,8 @@ target_include_directories(
 )
 target_link_libraries(nucleo_firmware.elf 
     HAL::STM32::F4::RCC
+    HAL::STM32::F4::TIM
+    HAL::STM32::F4::TIMEx
     HAL::STM32::F4::GPIO
     HAL::STM32::F4::CORTEX
     HAL::STM32::F4::UART
@@ -40,6 +52,8 @@ target_include_directories(
 )
 target_link_libraries(blackpill_firmware.elf 
     HAL::STM32::F4::RCC
+    HAL::STM32::F4::TIM
+    HAL::STM32::F4::TIMEx
     HAL::STM32::F4::GPIO
     HAL::STM32::F4::CORTEX
     HAL::STM32::F4::UART
