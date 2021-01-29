@@ -11,20 +11,13 @@ int main(void) {
 }
 
 void App::rcv_steering_cmd(const std_msgs::Int64 &new_steering_angle) {
-    StepperDirection dir = StepperDirection::ClockWise;
-    if (new_steering_angle.data < 0) {
-        dir = StepperDirection::CounterClockWise;
-        app.steering.stepper.pulse_n_tim(-1 * new_steering_angle.data, dir);
-    } else {
-        app.steering.stepper.pulse_n_tim(new_steering_angle.data, dir);
-    }
+    // angle coming from the high level controller are scaled by 100;
+    double angle = new_steering_angle.data / 100;
+    app.steering.set_angle(angle);
 }
 void App::rcv_zero_cmd(const std_msgs::Empty &zero) {
-    app.steering.encoder.set_zero();
+    app.steering.zero_angle();
 }
 void App::rcv_manual_cmd(const std_msgs::Bool &manual) {
-    if (manual.data)
-        app.steering.stepper.disable();
-    else
-        app.steering.stepper.enable();
+    app.steering.set_manual(manual.data);
 }

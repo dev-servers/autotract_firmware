@@ -18,7 +18,10 @@ struct Steering {
     void init();
     void set_angle(double angle);
     void get_angle();
+    void zero_angle();
+    void set_manual(bool man);
     uint32_t angle;
+    bool manual;
     Stepper stepper;
     Encoder encoder;
 };
