@@ -1,6 +1,6 @@
 #include <main.h>
-
 App app;
+uint32_t counter = 0;
 
 int main(void) {
     app.init();

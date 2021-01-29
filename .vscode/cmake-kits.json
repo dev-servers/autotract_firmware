@@ -1,0 +1,6 @@
+[
+    {
+        "name": "stm32",
+        "toolchainFile": "tools/stm32-cmake/cmake/stm32_gcc.cmake"
+    }
+]
