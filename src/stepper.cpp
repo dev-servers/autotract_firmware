@@ -41,8 +41,8 @@ void Stepper::set_speed(uint32_t steps_per_sec) {
 void Stepper::pulse_n_bang(uint32_t steps, StepperDirection dir) {
     GPIO_InitTypeDef g;
     g.Pin = _pulse_pin;
-    g.Mode = GPIO_MODE_OUTPUT_PP;
-    g.Pull = GPIO_NOPULL;
+    g.Mode = GPIO_MODE_OUTPUT_OD;
+    g.Pull = GPIO_PULLUP;
     g.Speed = GPIO_SPEED_FREQ_VERY_HIGH;
     g.Alternate = STEPPER_PULSE_AF;
     HAL_GPIO_Init(_pulse_port, &g);
