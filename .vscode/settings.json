@@ -1,0 +1,13 @@
+{
+    "C_Cpp.default.configurationProvider": "ms-vscode.cmake-tools",
+    "cortex-debug.armToolchainPath": "/home/tractor/Tools/gcc-arm-none-eabi-10-2020-q4-major/bin",
+    "cmake.cmakePath": "/home/tractor/Tools/cmake-3.19.4-Linux-aarch64/bin/cmake",
+    "files.associations": {
+        "*.tcc": "cpp",
+        "unordered_map": "cpp",
+        "fstream": "cpp",
+        "istream": "cpp",
+        "ostream": "cpp",
+        "sstream": "cpp"
+    }
+}
