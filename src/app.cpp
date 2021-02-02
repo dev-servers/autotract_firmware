@@ -32,7 +32,7 @@ void App::inc_counters() {
     heartbeat_counter++;
     steering_pos_pub_counter++;
     // motor_test_counter++;
-    uart_test_counter++;
+    // uart_test_counter++;
 }
 void App::init() {
     init_rcc();
