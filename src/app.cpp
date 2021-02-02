@@ -10,9 +10,8 @@ constexpr uint32_t ROS_SPIN_PERIOD = 20;         // 50 hz
 constexpr uint32_t HEARTBEAT_PERIOD = 1000;      // 1 hz
 constexpr uint32_t STEERING_POS_PUB_PERIOD = 20; // 50 hz
 App::App()
-    : steering_position_msg(), steering_manual_msg(),
+    : steering_position_msg(),
       pub_steering(steering_position_topic, &steering_position_msg),
-      pub_manual(steering_manual_topic, &steering_manual_msg),
       sub_steering_cmd(steering_cmd_topic, rcv_steering_cmd),
       sub_zero_cmd(zero_cmd_topic, rcv_zero_cmd),
       sub_manual_cmd(manual_cmd_topic, rcv_manual_cmd), node_handle(),
@@ -45,7 +44,6 @@ void App::init() {
     steering.init();
 
     node_handle.advertise(pub_steering);
-    node_handle.advertise(pub_manual);
     node_handle.subscribe(sub_steering_cmd);
     node_handle.subscribe(sub_zero_cmd);
     node_handle.subscribe(sub_manual_cmd);
@@ -82,36 +80,6 @@ void App::run() {
     run_heartbeat();
     run_ros_spin();
     run_pub_steering_pos();
-}
-void App::run_motor_test() {
-    if (motor_test_counter >= MOTOR_TEST_PERIOD) {
-        motor_test_counter = 0;
-        angle = -1 * angle;
-        steering.set_angle(angle);
-    }
-}
-void App::run_uart_test_blocking() {
-    if (uart_test_counter >= UART_TEST_PERIOD) {
-        uart_test_counter = 0;
-        HAL_UART_Receive(&(node_handle.getHardware()->_uarth), buff, 1, 100);
-        HAL_UART_Transmit(&(node_handle.getHardware()->_uarth), buff, 1, 100);
-    }
-}
-void App::run_uart_test_it() {
-    if (uart_test_counter >= UART_TEST_PERIOD) {
-        uart_test_counter = 0;
-        HAL_UART_Receive_IT(&(node_handle.getHardware()->_uarth), buff, 1);
-        HAL_UART_Transmit_IT(&(node_handle.getHardware()->_uarth), buff, 1);
-    }
-}
-void App::run_uart_test_dma() {
-    if (uart_test_counter >= UART_TEST_PERIOD) {
-        uart_test_counter = 0;
-        uint8_t data[1];
-        node_handle.getHardware()->reset_rbuf();
-        data[0] = node_handle.getHardware()->read();
-        node_handle.getHardware()->write(data, 1);
-    }
 }
 void App::run_heartbeat() {
     if (heartbeat_counter >= HEARTBEAT_PERIOD) {
