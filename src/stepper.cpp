@@ -96,7 +96,8 @@ void Stepper::init_gpio(GPIO_TypeDef *pulse_port, uint32_t pulse_pin,
     g.Alternate = STEPPER_PULSE_AF;
     HAL_GPIO_Init(pulse_port, &g);
     g.Pin = dir_pin;
-    g.Mode = GPIO_MODE_OUTPUT_PP;
+    g.Mode = GPIO_MODE_OUTPUT_OD;
+    g.Pull = GPIO_PULLUP;
     HAL_GPIO_Init(dir_port, &g);
     g.Pin = en_pin;
     HAL_GPIO_Init(en_port, &g);

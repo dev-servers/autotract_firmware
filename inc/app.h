@@ -30,6 +30,7 @@ struct App {
     static void rcv_manual_cmd(const std_msgs::Bool &manual);
     std_msgs::Int64MultiArray steering_position_msg;
     ros::Publisher pub_steering;
+    ros::Publisher pub_manual;
     ros::Subscriber<std_msgs::Int64> sub_steering_cmd;
     ros::Subscriber<std_msgs::Empty> sub_zero_cmd;
     ros::Subscriber<std_msgs::Bool> sub_manual_cmd;
@@ -39,4 +40,7 @@ struct App {
     uint32_t ros_spin_counter;
     uint32_t heartbeat_counter;
     uint32_t steering_pos_pub_counter;
+    uint32_t manual_pub_counter;
+    uint32_t motor_test_counter;
+    uint32_t uart_test_counter;
 };

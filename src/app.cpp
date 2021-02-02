@@ -5,13 +5,14 @@ const char *steering_position_topic = "autotract/steering/position";
 const char *steering_manual_topic = "autotract/steering/manual";
 const char *zero_cmd_topic = "autotract/steering/zero_cmd";
 const char *manual_cmd_topic = "autotract/steering/manual_cmd";
+
 constexpr uint32_t ROS_SPIN_PERIOD = 20;         // 50 hz
 constexpr uint32_t HEARTBEAT_PERIOD = 1000;      // 1 hz
 constexpr uint32_t STEERING_POS_PUB_PERIOD = 20; // 50 hz
-
 App::App()
-    : steering_position_msg(),
+    : steering_position_msg(), steering_manual_msg(),
       pub_steering(steering_position_topic, &steering_position_msg),
+      pub_manual(steering_manual_topic, &steering_manual_msg),
       sub_steering_cmd(steering_cmd_topic, rcv_steering_cmd),
       sub_zero_cmd(zero_cmd_topic, rcv_zero_cmd),
       sub_manual_cmd(manual_cmd_topic, rcv_manual_cmd), node_handle(),
@@ -31,9 +32,10 @@ void App::inc_counters() {
     heartbeat_counter++;
     steering_pos_pub_counter++;
     // manual_pub_counter++;
+    // motor_test_counter++;
+    // uart_test_counter++;
 }
 void App::init() {
-    HAL_Init();
     init_rcc();
     init_nvic();
     HAL_SYSTICK_Config(SystemCoreClock / 1000);
@@ -41,7 +43,9 @@ void App::init() {
     init_heartbeat();
 
     steering.init();
+
     node_handle.advertise(pub_steering);
+    node_handle.advertise(pub_manual);
     node_handle.subscribe(sub_steering_cmd);
     node_handle.subscribe(sub_zero_cmd);
     node_handle.subscribe(sub_manual_cmd);
@@ -49,12 +53,16 @@ void App::init() {
     steering.stepper.set_speed(1000);
 }
 void App::init_nvic() {
-    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
+    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
+    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_RXDMA_IRQn);
+    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_TXDMA_IRQn);
     HAL_NVIC_EnableIRQ(STEPPER_PULSE_TIM_IRQn);
     HAL_NVIC_EnableIRQ(ENCODER_TIM_IRQn);
 }
 void App::init_rcc() {
     init_clocks();
+    HAL_SYSTICK_Config(SystemCoreClock / 1000);
+    HAL_Init();
     HEARTBEAT_LED_PORT_CLK_EN();
     STEPPER_TIM_CLK_EN();
     STEPPER_PORTS_CLK_EN();
@@ -74,7 +82,36 @@ void App::run() {
     run_heartbeat();
     run_ros_spin();
     run_pub_steering_pos();
-    // run_pub_manual();
+}
+void App::run_motor_test() {
+    if (motor_test_counter >= MOTOR_TEST_PERIOD) {
+        motor_test_counter = 0;
+        angle = -1 * angle;
+        steering.set_angle(angle);
+    }
+}
+void App::run_uart_test_blocking() {
+    if (uart_test_counter >= UART_TEST_PERIOD) {
+        uart_test_counter = 0;
+        HAL_UART_Receive(&(node_handle.getHardware()->_uarth), buff, 1, 100);
+        HAL_UART_Transmit(&(node_handle.getHardware()->_uarth), buff, 1, 100);
+    }
+}
+void App::run_uart_test_it() {
+    if (uart_test_counter >= UART_TEST_PERIOD) {
+        uart_test_counter = 0;
+        HAL_UART_Receive_IT(&(node_handle.getHardware()->_uarth), buff, 1);
+        HAL_UART_Transmit_IT(&(node_handle.getHardware()->_uarth), buff, 1);
+    }
+}
+void App::run_uart_test_dma() {
+    if (uart_test_counter >= UART_TEST_PERIOD) {
+        uart_test_counter = 0;
+        uint8_t data[1];
+        node_handle.getHardware()->reset_rbuf();
+        data[0] = node_handle.getHardware()->read();
+        node_handle.getHardware()->write(data, 1);
+    }
 }
 void App::run_heartbeat() {
     if (heartbeat_counter >= HEARTBEAT_PERIOD) {
