@@ -2,11 +2,12 @@
 
 const char *steering_cmd_topic = "autotract/steering/position_cmd";
 const char *steering_position_topic = "autotract/steering/position";
+const char *steering_manual_topic = "autotract/steering/manual";
 const char *zero_cmd_topic = "autotract/steering/zero_cmd";
 const char *manual_cmd_topic = "autotract/steering/manual_cmd";
 constexpr uint32_t ROS_SPIN_PERIOD = 20;         // 50 hz
 constexpr uint32_t HEARTBEAT_PERIOD = 1000;      // 1 hz
-constexpr uint32_t STEERING_POS_PUB_PERIOD = 10; // 100 hz
+constexpr uint32_t STEERING_POS_PUB_PERIOD = 20; // 50 hz
 
 App::App()
     : steering_position_msg(),
@@ -21,23 +22,30 @@ App::App()
     ros_spin_counter = 0;
     heartbeat_counter = 0;
     steering_pos_pub_counter = 0;
+    steering_position_msg_data[0] = 0;
+    steering_position_msg_data[1] = 0;
+    // manual_pub_counter = 0;
 }
 void App::inc_counters() {
     ros_spin_counter++;
     heartbeat_counter++;
     steering_pos_pub_counter++;
+    // manual_pub_counter++;
 }
 void App::init() {
     HAL_Init();
     init_rcc();
     init_nvic();
     HAL_SYSTICK_Config(SystemCoreClock / 1000);
-    node_handle.initNode();
+    init_swd();
+    init_heartbeat();
+
     steering.init();
     node_handle.advertise(pub_steering);
     node_handle.subscribe(sub_steering_cmd);
     node_handle.subscribe(sub_zero_cmd);
     node_handle.subscribe(sub_manual_cmd);
+    node_handle.initNode();
     steering.stepper.set_speed(1000);
 }
 void App::init_nvic() {
@@ -66,6 +74,7 @@ void App::run() {
     run_heartbeat();
     run_ros_spin();
     run_pub_steering_pos();
+    // run_pub_manual();
 }
 void App::run_heartbeat() {
     if (heartbeat_counter >= HEARTBEAT_PERIOD) {
@@ -80,9 +89,13 @@ void App::run_ros_spin() {
     }
 }
 void App::run_pub_steering_pos() {
-    if (steering_pos_pub_counter >= STEERING_POS_PUB_PERIOD) {
+    if (node_handle.connected() &&
+        (steering_pos_pub_counter >= STEERING_POS_PUB_PERIOD)) {
         steering_pos_pub_counter = 0;
-        steering_position_msg.data = steering.encoder.get_steps();
+        steering.get_angle();
+        steering_position_msg_data[0] = (int64_t)(steering.angle * 100);
+        steering_position_msg_data[1] = steering.manual ? 1 : 0;
+        steering_position_msg.data = steering_position_msg_data;
         pub_steering.publish(&steering_position_msg);
     }
 }

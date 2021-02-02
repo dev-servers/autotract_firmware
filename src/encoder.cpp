@@ -55,7 +55,7 @@ void Encoder::init_gpio(GPIO_TypeDef *a_port, uint32_t a_pin,
                         GPIO_TypeDef *b_port, uint32_t b_pin) {
     GPIO_InitTypeDef g = {0};
     g.Pin = a_pin;
-    g.Mode = GPIO_MODE_AF_PP;
+    g.Mode = GPIO_MODE_AF_OD;
     g.Pull = GPIO_NOPULL;
     g.Speed = GPIO_SPEED_FREQ_LOW;
     g.Alternate = ENCODER_AF;

@@ -39,7 +39,7 @@ target_link_libraries(nucleo_firmware.elf
     STM32::NoSys
 )
 target_compile_definitions(nucleo_firmware.elf PUBLIC NUCLEO)
-
+target_compile_options(nucleo_firmware.elf PUBLIC -O0)
 # BlackPill STM32F411CE
 add_executable(blackpill_firmware.elf ${SOURCE_FILES})
 
@@ -62,3 +62,4 @@ target_link_libraries(blackpill_firmware.elf
     STM32::NoSys
 )
 target_compile_definitions(blackpill_firmware.elf PUBLIC BLACKPILL)
+target_compile_options(blackpill_firmware.elf PUBLIC -O0)
