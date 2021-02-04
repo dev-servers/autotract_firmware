@@ -49,7 +49,7 @@ void ROSSerial::init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
     txdma->Init.FIFOMode = DMA_FIFOMODE_DISABLE;
 
     // USART config
-    handle->Init.BaudRate = 5700;
+    handle->Init.BaudRate = 1000000;
     handle->Init.WordLength = UART_WORDLENGTH_8B;
     handle->Init.Mode = UART_MODE_TX_RX;
     handle->Init.Parity = UART_PARITY_NONE;

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
-set(STM32_TOOLCHAIN_PATH /home/tarek/Work/Tools/gcc-arm-none-eabi-10-2020)
-# set(STM32_TOOLCHAIN_PATH /home/tractor/Tools/gcc-arm-none-eabi-10-2020-q4-major)
+# set(STM32_TOOLCHAIN_PATH /home/tarek/Work/Tools/gcc-arm-none-eabi-10-2020)
+set(STM32_TOOLCHAIN_PATH /home/tractor/Tools/gcc-arm-none-eabi-10-2020-q4-major)
 set(CMAKE_TOOLCHAIN_FILE tools/stm32-cmake/cmake/stm32_gcc.cmake)
 
 project(firmware C CXX ASM)

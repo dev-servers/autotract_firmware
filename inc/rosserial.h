@@ -18,7 +18,7 @@ struct ROSSerial {
                           DMA_Stream_TypeDef *rxdma_inst,
                           DMA_Stream_TypeDef *txdma_inst, uint32_t rx_channel,
                           uint32_t tx_channel);
-
+    static void uart_err_callback(UART_HandleTypeDef *uart);
     UART_HandleTypeDef _uarth;
 
   protected:

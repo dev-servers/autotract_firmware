@@ -25,18 +25,18 @@ void Steering::init() {
     set_manual(true);
     encoder.init();
 }
-void Steering::set_angle(double angle) {
+void Steering::set_angle(double new_angle) {
+    double delta_angle = new_angle - angle;
     int32_t target_steps =
-        angle * STEPPER_STEPS_PER_PI * STEPPER_STEPS_PER_ENCODER_STEPS;
-    int32_t current_steps = encoder.get_steps();
-    int32_t steps_s = target_steps - current_steps;
-    if (steps_s < 0) {
-        uint32_t steps = -1 * steps_s;
+        delta_angle * STEPPER_STEPS_PER_PI * STEPPER_STEPS_PER_ENCODER_STEPS;
+    if (delta_angle < 0) {
+        uint32_t steps = -1 * target_steps;
         stepper.pulse_n_tim(steps, StepperDirection::CounterClockWise);
     } else {
-        uint32_t steps = steps_s;
+        uint32_t steps = target_steps;
         stepper.pulse_n_tim(steps, StepperDirection::ClockWise);
     }
+    angle = new_angle;
 }
 void Steering::set_manual(bool man) {
     manual = man;
@@ -46,7 +46,10 @@ void Steering::set_manual(bool man) {
         stepper.enable();
 }
 void Steering::get_angle() {
-    int32_t current_steps = encoder.get_steps();
-    angle = (double)current_steps / ENCODER_STEPS_PER_PI;
+    // int32_t current_steps = encoder.get_steps();
+    // angle = (double)current_steps / ENCODER_STEPS_PER_PI;
 }
-void Steering::zero_angle() { encoder.set_zero(); }
+void Steering::zero_angle() {
+    encoder.set_zero();
+    angle = 0;
+}

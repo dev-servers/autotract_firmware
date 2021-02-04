@@ -21,3 +21,7 @@ void App::rcv_zero_cmd(const std_msgs::Empty &zero) {
 void App::rcv_manual_cmd(const std_msgs::Bool &manual) {
     app.steering.set_manual(manual.data);
 }
+
+extern "C" void HAL_UART_ErrorCallback(UART_HandleTypeDef *handle) {
+    app.node_handle.initNode();
+}

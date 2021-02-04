@@ -6,9 +6,9 @@ const char *steering_manual_topic = "autotract/steering/manual";
 const char *zero_cmd_topic = "autotract/steering/zero_cmd";
 const char *manual_cmd_topic = "autotract/steering/manual_cmd";
 
-constexpr uint32_t ROS_SPIN_PERIOD = 20;         // 50 hz
+constexpr uint32_t ROS_SPIN_PERIOD = 400;        // 50 hz
 constexpr uint32_t HEARTBEAT_PERIOD = 1000;      // 1 hz
-constexpr uint32_t STEERING_POS_PUB_PERIOD = 20; // 50 hz
+constexpr uint32_t STEERING_POS_PUB_PERIOD = 33; // 30 hz
 App::App()
     : steering_position_msg(),
       pub_steering(steering_position_topic, &steering_position_msg),
@@ -48,7 +48,7 @@ void App::init() {
     node_handle.subscribe(sub_zero_cmd);
     node_handle.subscribe(sub_manual_cmd);
     node_handle.initNode();
-    steering.stepper.set_speed(1000);
+    // steering.stepper.set_speed(5000);
 }
 void App::init_nvic() {
     // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);

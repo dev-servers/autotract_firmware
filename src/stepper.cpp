@@ -108,8 +108,8 @@ void Stepper::init_tim(TIM_HandleTypeDef *tim, TIM_TypeDef *tim_inst,
     TIM_OC_InitTypeDef tim_oc_config = {0};
 
     tim->Instance = tim_inst;
-    tim->Init.Prescaler = 999;
-    tim->Init.Period = 999;
+    tim->Init.Prescaler = 99;
+    tim->Init.Period = 400;
     tim->Init.RepetitionCounter = 1;
     tim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     tim->Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -125,7 +125,7 @@ void Stepper::init_tim(TIM_HandleTypeDef *tim, TIM_TypeDef *tim_inst,
         Error_Handler();
     }
     tim_oc_config.OCMode = TIM_OCMODE_PWM1;
-    tim_oc_config.Pulse = 500;
+    tim_oc_config.Pulse = 200;
     tim_oc_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     tim_oc_config.OCFastMode = TIM_OCFAST_DISABLE;
     tim_oc_config.OCIdleState = TIM_OCIDLESTATE_RESET;
