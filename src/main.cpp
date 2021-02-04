@@ -12,7 +12,7 @@ int main(void) {
 
 void App::rcv_steering_cmd(const std_msgs::Int64 &new_steering_angle) {
     // angle coming from the high level controller are scaled by 100;
-    double angle = new_steering_angle.data / 100;
+    double angle = (double)new_steering_angle.data / 100;
     app.steering.set_angle(angle);
 }
 void App::rcv_zero_cmd(const std_msgs::Empty &zero) {
