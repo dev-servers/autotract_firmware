@@ -24,6 +24,7 @@ struct App {
     void run_heartbeat();
     void run_ros_spin();
     void run_pub_steering_pos();
+    // void check_disconnect();
     static void rcv_steering_cmd(const std_msgs::Int64 &new_steering_angle);
     static void rcv_zero_cmd(const std_msgs::Empty &zero);
     static void rcv_manual_cmd(const std_msgs::Bool &manual);

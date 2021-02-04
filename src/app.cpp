@@ -101,6 +101,8 @@ void App::run_pub_steering_pos() {
         steering_position_msg_data[0] = (int64_t)(steering.angle * 100);
         steering_position_msg_data[1] = steering.manual ? 1 : 0;
         steering_position_msg.data = steering_position_msg_data;
+        steering_position_msg.data_length = 2;
         pub_steering.publish(&steering_position_msg);
     }
 }
+// void App::check_disconnect() { if (!node_handle.connected()) }
