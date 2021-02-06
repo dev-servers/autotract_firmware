@@ -34,6 +34,9 @@ struct Stepper {
     static void tim_update_handler(TIM_HandleTypeDef *tim);
     void pulse_update();
     int step_counter;
+    uint32_t min_period;
+    uint32_t max_period;
+    uint32_t current_period;
     TIM_TypeDef *_tim_inst;
     uint32_t _tim_pulse_channel;
     GPIO_TypeDef *_pulse_port;

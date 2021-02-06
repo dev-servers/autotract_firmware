@@ -7,9 +7,11 @@ Stepper::Stepper(TIM_TypeDef *tim_inst, uint32_t tim_pulse_channel,
                  GPIO_TypeDef *pulse_port, uint32_t pulse_pin,
                  GPIO_TypeDef *dir_port, uint32_t dir_pin,
                  GPIO_TypeDef *en_port, uint32_t en_pin)
-    : _tim_inst(tim_inst), _tim_pulse_channel(tim_pulse_channel),
-      _pulse_port(pulse_port), _pulse_pin(pulse_pin), _dir_port(dir_port),
-      _dir_pin(dir_pin), _en_port(en_port), _en_pin(en_pin) {
+    : step_counter(0), min_period(400), max_period(10000),
+      current_period(10000), _tim_inst(tim_inst),
+      _tim_pulse_channel(tim_pulse_channel), _pulse_port(pulse_port),
+      _pulse_pin(pulse_pin), _dir_port(dir_port), _dir_pin(dir_pin),
+      _en_port(en_port), _en_pin(en_pin) {
     delay = 100;
     Stepper::instances_count++;
     Stepper::instances[Stepper::instances_count - 1] = this;
@@ -81,7 +83,17 @@ void Stepper::disable() {
 void Stepper::pulse_update() {
     step_counter--;
     if (step_counter == 0) {
+        current_period = 10000;
+        __HAL_TIM_SetAutoreload(&_tim_handle, current_period);
+        __HAL_TIM_SetCompare(&_tim_handle, _tim_pulse_channel,
+                             current_period / 2);
         HAL_TIM_OC_Stop_IT(&_tim_handle, _tim_pulse_channel);
+    } else {
+        if (current_period > min_period)
+            current_period -= 200;
+        __HAL_TIM_SetAutoreload(&_tim_handle, current_period);
+        __HAL_TIM_SetCompare(&_tim_handle, _tim_pulse_channel,
+                             current_period / 2);
     }
 }
 void Stepper::init_gpio(GPIO_TypeDef *pulse_port, uint32_t pulse_pin,
