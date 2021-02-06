@@ -7,11 +7,10 @@ Stepper::Stepper(TIM_TypeDef *tim_inst, uint32_t tim_pulse_channel,
                  GPIO_TypeDef *pulse_port, uint32_t pulse_pin,
                  GPIO_TypeDef *dir_port, uint32_t dir_pin,
                  GPIO_TypeDef *en_port, uint32_t en_pin)
-    : step_counter(0), min_period(400), max_period(10000),
-      current_period(10000), _tim_inst(tim_inst),
-      _tim_pulse_channel(tim_pulse_channel), _pulse_port(pulse_port),
-      _pulse_pin(pulse_pin), _dir_port(dir_port), _dir_pin(dir_pin),
-      _en_port(en_port), _en_pin(en_pin) {
+    : step_counter(0), min_period(400), max_period(4000), current_period(4000),
+      _tim_inst(tim_inst), _tim_pulse_channel(tim_pulse_channel),
+      _pulse_port(pulse_port), _pulse_pin(pulse_pin), _dir_port(dir_port),
+      _dir_pin(dir_pin), _en_port(en_port), _en_pin(en_pin) {
     delay = 100;
     Stepper::instances_count++;
     Stepper::instances[Stepper::instances_count - 1] = this;
@@ -83,18 +82,21 @@ void Stepper::disable() {
 void Stepper::pulse_update() {
     step_counter--;
     if (step_counter == 0) {
-        current_period = 10000;
-        __HAL_TIM_SetAutoreload(&_tim_handle, current_period);
-        __HAL_TIM_SetCompare(&_tim_handle, _tim_pulse_channel,
-                             current_period / 2);
+        current_period = 4000;
         HAL_TIM_OC_Stop_IT(&_tim_handle, _tim_pulse_channel);
-    } else {
+    } else if (step_counter > 60) {
+        // 48 pulses corrospond to approx 22.5 degrees of rotation
+        // I was aiming for 20 degrees but this is as close it gets with evenly
+        // divisable numbers
         if (current_period > min_period)
-            current_period -= 200;
-        __HAL_TIM_SetAutoreload(&_tim_handle, current_period);
-        __HAL_TIM_SetCompare(&_tim_handle, _tim_pulse_channel,
-                             current_period / 2);
+            current_period -= 60;
+    } else {
+        // if less than 22.5 degrees to go then start ramping down the speed
+        if (current_period < max_period)
+            current_period += 60;
     }
+    __HAL_TIM_SetAutoreload(&_tim_handle, current_period);
+    __HAL_TIM_SetCompare(&_tim_handle, _tim_pulse_channel, current_period / 2);
 }
 void Stepper::init_gpio(GPIO_TypeDef *pulse_port, uint32_t pulse_pin,
                         GPIO_TypeDef *dir_port, uint32_t dir_pin,
@@ -121,7 +123,7 @@ void Stepper::init_tim(TIM_HandleTypeDef *tim, TIM_TypeDef *tim_inst,
 
     tim->Instance = tim_inst;
     tim->Init.Prescaler = 99;
-    tim->Init.Period = 400;
+    tim->Init.Period = 4000;
     tim->Init.RepetitionCounter = 1;
     tim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     tim->Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -137,7 +139,7 @@ void Stepper::init_tim(TIM_HandleTypeDef *tim, TIM_TypeDef *tim_inst,
         Error_Handler();
     }
     tim_oc_config.OCMode = TIM_OCMODE_PWM1;
-    tim_oc_config.Pulse = 200;
+    tim_oc_config.Pulse = 2000;
     tim_oc_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     tim_oc_config.OCFastMode = TIM_OCFAST_DISABLE;
     tim_oc_config.OCIdleState = TIM_OCIDLESTATE_RESET;
