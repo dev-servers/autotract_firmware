@@ -77,15 +77,17 @@ void Steering::init() {
  * @param new_angle
  */
 void Steering::set_angle(double new_angle) {
-    double delta_angle = new_angle - angle;
-    int32_t target_steps =
-        delta_angle * STEPPER_STEPS_PER_PI * STEPPER_STEPS_PER_ENCODER_STEPS;
-    if (delta_angle < 0) {
-        uint32_t steps = -1 * target_steps;
-        stepper.pulse_n_tim(steps, StepperDirection::CounterClockWise);
-    } else {
-        uint32_t steps = target_steps;
-        stepper.pulse_n_tim(steps, StepperDirection::ClockWise);
+    if (!manual) {
+        double delta_angle = (new_angle - angle) / 180;
+        int32_t target_steps = delta_angle * STEPPER_STEPS_PER_PI *
+                               STEPPER_STEPS_PER_ENCODER_STEPS;
+        if (delta_angle < 0) {
+            uint32_t steps = -1 * target_steps;
+            stepper.pulse_n_tim(steps, StepperDirection::CounterClockWise);
+        } else {
+            uint32_t steps = target_steps;
+            stepper.pulse_n_tim(steps, StepperDirection::ClockWise);
+        }
     }
     // angle = new_angle;
 }
