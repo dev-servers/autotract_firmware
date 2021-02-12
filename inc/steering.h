@@ -7,13 +7,22 @@
 #define STEPS_PER_REV 1000
 
 struct Steering {
-  public:
-    Steering(TIM_TypeDef *stepper_tim_inst, uint32_t stepper_tim_pulse_channel,
-             GPIO_TypeDef *stepper_pulse_port, uint32_t stepper_pulse_pin,
-             GPIO_TypeDef *stepper_dir_port, uint32_t stepper_dir_pin,
-             GPIO_TypeDef *stepper_en_port, uint32_t stepper_en_pin,
-             TIM_TypeDef *encoder_tim_inst, GPIO_TypeDef *encoder_a_port,
-             uint32_t encoder_a_pin, GPIO_TypeDef *encoder_b_port,
+   public:
+    Steering(TIM_TypeDef* stepper_tim_inst,
+             TIM_TypeDef* stepper_cnt_tim_inst,
+             uint32_t stepper_tim_pulse_channel,
+             uint32_t stepper_cnt_tim_channel,
+             uint32_t stepper_cnt_angle_tim_channel,
+             GPIO_TypeDef* stepper_pulse_port,
+             uint32_t stepper_pulse_pin,
+             GPIO_TypeDef* stepper_dir_port,
+             uint32_t stepper_dir_pin,
+             GPIO_TypeDef* stepper_en_port,
+             uint32_t stepper_en_pin,
+             TIM_TypeDef* encoder_tim_inst,
+             GPIO_TypeDef* encoder_a_port,
+             uint32_t encoder_a_pin,
+             GPIO_TypeDef* encoder_b_port,
              uint32_t encoder_b_pin);
     void init();
     void set_angle(double angle);

@@ -50,6 +50,9 @@ extern "C" void ROSSERIAL_UART_IRQHandler(void) {
 extern "C" void STEPPER_PULSE_TIM_HANDLER(void) {
     HAL_TIM_IRQHandler(&(app.steering.stepper._tim_handle));
 }
-extern "C" void ENCODER_TIM_HANDLER(void) {
-    HAL_TIM_IRQHandler(&(app.steering.encoder._tim_handle));
+extern "C" void STEPPER_CNT_TIM_HANDLER(void) {
+    HAL_TIM_IRQHandler(&(app.steering.stepper._cnt_tim_handle));
 }
+// extern "C" void ENCODER_TIM_HANDLER(void) {
+//     HAL_TIM_IRQHandler(&(app.steering.encoder._tim_handle));
+// }

@@ -1,24 +1,37 @@
 #include <app.h>
 
-const char *steering_cmd_topic = "autotract/steering/position_cmd";
-const char *steering_position_topic = "autotract/steering/position";
-const char *steering_manual_topic = "autotract/steering/manual";
-const char *zero_cmd_topic = "autotract/steering/zero_cmd";
-const char *manual_cmd_topic = "autotract/steering/manual_cmd";
+const char* steering_cmd_topic = "autotract/steering/position_cmd";
+const char* steering_position_topic = "autotract/steering/position";
+const char* steering_manual_topic = "autotract/steering/manual";
+const char* zero_cmd_topic = "autotract/steering/zero_cmd";
+const char* manual_cmd_topic = "autotract/steering/manual_cmd";
 
-constexpr uint32_t ROS_SPIN_PERIOD = 400;        // 50 hz
-constexpr uint32_t HEARTBEAT_PERIOD = 1000;      // 1 hz
-constexpr uint32_t STEERING_POS_PUB_PERIOD = 33; // 30 hz
+constexpr uint32_t ROS_SPIN_PERIOD = 400;         // 50 hz
+constexpr uint32_t HEARTBEAT_PERIOD = 1000;       // 1 hz
+constexpr uint32_t STEERING_POS_PUB_PERIOD = 33;  // 30 hz
 App::App()
     : steering_position_msg(),
       pub_steering(steering_position_topic, &steering_position_msg),
       sub_steering_cmd(steering_cmd_topic, rcv_steering_cmd),
       sub_zero_cmd(zero_cmd_topic, rcv_zero_cmd),
-      sub_manual_cmd(manual_cmd_topic, rcv_manual_cmd), node_handle(),
-      steering(STEPPER_PULSE_TIM, STEPPER_PULSE_TIM_CH, STEPPER_PULSE_PORT,
-               STEPPER_PULSE_PIN, STEPPER_DIR_PORT, STEPPER_DIR_PIN,
-               STEPPER_EN_PORT, STEPPER_EN_PIN, ENCODER_TIM, ENCODER_A_PORT,
-               ENCODER_A_PIN, ENCODER_B_PORT, ENCODER_B_PIN) {
+      sub_manual_cmd(manual_cmd_topic, rcv_manual_cmd),
+      node_handle(),
+      steering(STEPPER_PULSE_TIM,
+               STEPPER_CNT_TIM,
+               STEPPER_PULSE_TIM_CH,
+               STEPPER_CNT_TIM_CH,
+               STEPPER_CNT_ANGLE_TIM_CH,
+               STEPPER_PULSE_PORT,
+               STEPPER_PULSE_PIN,
+               STEPPER_DIR_PORT,
+               STEPPER_DIR_PIN,
+               STEPPER_EN_PORT,
+               STEPPER_EN_PIN,
+               ENCODER_TIM,
+               ENCODER_A_PORT,
+               ENCODER_A_PIN,
+               ENCODER_B_PORT,
+               ENCODER_B_PIN) {
     ros_spin_counter = 0;
     heartbeat_counter = 0;
     steering_pos_pub_counter = 0;
@@ -30,9 +43,6 @@ void App::inc_counters() {
     ros_spin_counter++;
     heartbeat_counter++;
     steering_pos_pub_counter++;
-    // manual_pub_counter++;
-    // motor_test_counter++;
-    // uart_test_counter++;
 }
 void App::init() {
     init_rcc();
@@ -51,10 +61,17 @@ void App::init() {
     // steering.stepper.set_speed(5000);
 }
 void App::init_nvic() {
-    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
-    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_RXDMA_IRQn);
-    // HAL_NVIC_EnableIRQ(ROSSERIAL_UART_TXDMA_IRQn);
+    HAL_NVIC_SetPriority(ROSSERIAL_UART_RXDMA_IRQn, 2, 1);
+    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_RXDMA_IRQn);
+    HAL_NVIC_SetPriority(ROSSERIAL_UART_TXDMA_IRQn, 2, 0);
+    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_TXDMA_IRQn);
+    HAL_NVIC_SetPriority(ROSSERIAL_UART_IRQn, 2, 3);
+    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
+    HAL_NVIC_SetPriority(STEPPER_PULSE_TIM_IRQn, 1, 0);
     HAL_NVIC_EnableIRQ(STEPPER_PULSE_TIM_IRQn);
+    HAL_NVIC_SetPriority(STEPPER_CNT_TIM_IRQn, 1, 1);
+    HAL_NVIC_EnableIRQ(STEPPER_CNT_TIM_IRQn);
+    HAL_NVIC_SetPriority(ENCODER_TIM_IRQn, 3, 0);
     HAL_NVIC_EnableIRQ(ENCODER_TIM_IRQn);
 }
 void App::init_rcc() {
@@ -67,7 +84,9 @@ void App::init_rcc() {
     ENCODER_TIM_CLK_EN();
     ENCODER_PORTS_CLK_EN();
 }
-void App::init_swd() { SWD_PORT_CLK_EN(); }
+void App::init_swd() {
+    SWD_PORT_CLK_EN();
+}
 void App::init_heartbeat() {
     GPIO_InitTypeDef GPIO_Config;
     GPIO_Config.Mode = GPIO_MODE_OUTPUT_PP;

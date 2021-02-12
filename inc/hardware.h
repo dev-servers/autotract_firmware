@@ -46,6 +46,13 @@ constexpr uint32_t BOARD = 1;
 #define STEPPER_PULSE_PIN GPIO_PIN_5
 #define STEPPER_PULSE_PORT GPIOB
 
+#define STEPPER_CNT_TIM TIM4
+#define STEPPER_CNT_TIM_CH TIM_CHANNEL_2
+#define STEPPER_CNT_ANGLE_TIM_CH TIM_CHANNEL_1
+#define STEPPER_CNT_TIM_HANDLER TIM4_IRQHandler
+#define STEPPER_CNT_TIM_IRQn TIM4_IRQn
+#define STEPPER_CNT_TIM_CLK_EN __HAL_RCC_TIM4_CLK_ENABLE
+
 #define STEPPER_DIR_PIN GPIO_PIN_4
 #define STEPPER_DIR_PORT GPIOB
 
@@ -69,10 +76,10 @@ constexpr uint32_t BOARD = 1;
 #define ENCODER_AF GPIO_AF2_TIM4
 #define ENCODER_A_PORT GPIOB
 #define ENCODER_B_PORT GPIOD
-#define ENCODER_PORTS_CLK_EN()                                                 \
-    do {                                                                       \
-        __HAL_RCC_GPIOB_CLK_ENABLE();                                          \
-        __HAL_RCC_GPIOD_CLK_ENABLE();                                          \
+#define ENCODER_PORTS_CLK_EN()        \
+    do {                              \
+        __HAL_RCC_GPIOB_CLK_ENABLE(); \
+        __HAL_RCC_GPIOD_CLK_ENABLE(); \
     } while (0);
 
 #endif
@@ -114,6 +121,13 @@ constexpr uint32_t BOARD = 1;
 #define STEPPER_PULSE_PIN GPIO_PIN_5
 #define STEPPER_PULSE_PORT GPIOB
 
+#define STEPPER_CNT_TIM TIM4
+#define STEPPER_CNT_TIM_CH TIM_CHANNEL_2
+#define STEPPER_CNT_ANGLE_TIM_CH TIM_CHANNEL_1
+#define STEPPER_CNT_TIM_HANDLER TIM4_IRQHandler
+#define STEPPER_CNT_TIM_IRQn TIM4_IRQn
+#define STEPPER_CNT_TIM_CLK_EN __HAL_RCC_TIM4_CLK_ENABLE
+
 #define STEPPER_DIR_PIN GPIO_PIN_4
 #define STEPPER_DIR_PORT GPIOB
 
@@ -137,9 +151,9 @@ constexpr uint32_t BOARD = 1;
 #define ENCODER_AF GPIO_AF2_TIM4
 #define ENCODER_A_PORT GPIOB
 #define ENCODER_B_PORT GPIOB
-#define ENCODER_PORTS_CLK_EN()                                                 \
-    do {                                                                       \
-        __HAL_RCC_GPIOB_CLK_ENABLE();                                          \
+#define ENCODER_PORTS_CLK_EN()        \
+    do {                              \
+        __HAL_RCC_GPIOB_CLK_ENABLE(); \
     } while (0);
 
 #endif

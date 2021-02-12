@@ -1,12 +1,14 @@
 #include <rosserial.h>
 
 ROSSerial::ROSSerial() : rind(0), twind(0), tfind(0) {}
-void ROSSerial::init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
-                          DMA_HandleTypeDef *txdma, USART_TypeDef *usart_inst,
-                          DMA_Stream_TypeDef *rxdma_inst,
-                          DMA_Stream_TypeDef *txdma_inst, uint32_t rx_channel,
+void ROSSerial::init_uart(UART_HandleTypeDef* handle,
+                          DMA_HandleTypeDef* rxdma,
+                          DMA_HandleTypeDef* txdma,
+                          USART_TypeDef* usart_inst,
+                          DMA_Stream_TypeDef* rxdma_inst,
+                          DMA_Stream_TypeDef* txdma_inst,
+                          uint32_t rx_channel,
                           uint32_t tx_channel) {
-
     assert_param(IS_DMA_CHANNEL(rx_channel));
     assert_param(IS_DMA_CHANNEL(tx_channel));
     assert_param(IS_DMA_STREAM_ALL_INSTANCE(rxdma_inst));
@@ -77,12 +79,6 @@ void ROSSerial::init_uart(UART_HandleTypeDef *handle, DMA_HandleTypeDef *rxdma,
     if (s != HAL_OK) {
         Error_Handler();
     }
-    HAL_NVIC_SetPriority(ROSSERIAL_UART_RXDMA_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_RXDMA_IRQn);
-    HAL_NVIC_SetPriority(ROSSERIAL_UART_TXDMA_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_TXDMA_IRQn);
-    HAL_NVIC_SetPriority(ROSSERIAL_UART_IRQn, 0, 0);
-    HAL_NVIC_EnableIRQ(ROSSERIAL_UART_IRQn);
 }
 void ROSSerial::init() {
     init_uart(&_uarth, &rxdma, &txdma, ROSSERIAL_UART,
@@ -90,7 +86,9 @@ void ROSSerial::init() {
               ROSSERIAL_UART_RXDMA_CHANNEL, ROSSERIAL_UART_TXDMA_CHANNEL);
     reset_rbuf();
 }
-void ROSSerial::reset_rbuf() { HAL_UART_Receive_DMA(&_uarth, rbuf, rbuflen); }
+void ROSSerial::reset_rbuf() {
+    HAL_UART_Receive_DMA(&_uarth, rbuf, rbuflen);
+}
 int ROSSerial::read() {
     int c = -1;
     if (rind != getRdmaInd()) {
@@ -113,7 +111,7 @@ void ROSSerial::flush(void) {
         mutex = false;
     }
 }
-void ROSSerial::write(uint8_t *data, int length) {
+void ROSSerial::write(uint8_t* data, int length) {
     int n = length;
     n = n <= (int)tbuflen ? n : tbuflen;
 
@@ -127,4 +125,6 @@ void ROSSerial::write(uint8_t *data, int length) {
 
     flush();
 }
-uint32_t ROSSerial::time() { return HAL_GetTick(); }
+uint32_t ROSSerial::time() {
+    return HAL_GetTick();
+}
