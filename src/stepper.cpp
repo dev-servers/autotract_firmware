@@ -1,6 +1,6 @@
 #include <stepper.h>
 
-constexpr uint32_t STEPS_PER_ROT = 72000;
+constexpr uint32_t STEPS_PER_ROT = 72000 * 5;
 constexpr uint32_t STEPS_PER_DEGREE = STEPS_PER_ROT / 360;
 constexpr uint32_t channel_lut[5] = {TIM_CHANNEL_1, TIM_CHANNEL_2,
                                      TIM_CHANNEL_3, 0, TIM_CHANNEL_4};
@@ -248,7 +248,7 @@ void Stepper::init_tim(TIM_HandleTypeDef* tim,
     // defaulting to 10000 steps per second for 50MHz timer clock
     tim->Instance = tim_inst;
     tim->Init.Prescaler = 9;
-    tim->Init.Period = 500;
+    tim->Init.Period = 800;
     tim->Init.RepetitionCounter = 1;
     tim->Init.ClockDivision = TIM_CLOCKDIVISION_DIV1;
     tim->Init.CounterMode = TIM_COUNTERMODE_UP;
@@ -269,7 +269,7 @@ void Stepper::init_tim(TIM_HandleTypeDef* tim,
     }
     // Initialize pulse timer PWM channel with 50% duty cycle
     tim_oc_config.OCMode = TIM_OCMODE_PWM1;
-    tim_oc_config.Pulse = 250;
+    tim_oc_config.Pulse = 400;
     tim_oc_config.OCPolarity = TIM_OCPOLARITY_HIGH;
     tim_oc_config.OCFastMode = TIM_OCFAST_DISABLE;
     tim_oc_config.OCIdleState = TIM_OCIDLESTATE_RESET;
@@ -325,6 +325,9 @@ void Stepper::init_tim(TIM_HandleTypeDef* tim,
  */
 double Stepper::get_angle() {
     return (double)position / STEPS_PER_DEGREE;
+}
+void Stepper::set_zero() {
+    position = 0;
 }
 /**
  * @brief Trampoline function to call the pulse_update for each

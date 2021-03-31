@@ -30,7 +30,7 @@ struct Stepper {
     void enable();
     void disable();
     double get_angle();
-
+    void set_zero();
     static void init_gpio(GPIO_TypeDef* pulse_port,
                           uint32_t pulse_pin,
                           GPIO_TypeDef* dir_port,
@@ -53,7 +53,7 @@ struct Stepper {
     static void cnt_tim_oc_handler(TIM_HandleTypeDef* tim);
     void pulse_update();
     void cnt_update(uint32_t channel);
-    int step_counter;
+    uint32_t step_counter;
     int position;
     int step;
     int next_angle_steps;
