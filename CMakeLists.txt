@@ -21,15 +21,15 @@ src/encoder.cpp
 libs/ros/time.cpp)
 
 # Nucleo STM32F412ZG 
-add_executable(nucleo_firmware.elf ${SOURCE_FILES})
-target_compile_features(nucleo_firmware.elf  PUBLIC cxx_std_17)
+add_executable(nucleo_firmware ${SOURCE_FILES})
+target_compile_features(nucleo_firmware  PUBLIC cxx_std_17)
 target_include_directories(
-    nucleo_firmware.elf
+    nucleo_firmware
     PUBLIC
     inc/
     libs/ros/
 )
-target_link_libraries(nucleo_firmware.elf 
+target_link_libraries(nucleo_firmware
     HAL::STM32::F4::RCC
     HAL::STM32::F4::TIM
     HAL::STM32::F4::TIMEx
@@ -40,18 +40,18 @@ target_link_libraries(nucleo_firmware.elf
     CMSIS::STM32::F412ZG
     STM32::NoSys
 )
-target_compile_definitions(nucleo_firmware.elf PUBLIC NUCLEO)
+target_compile_definitions(nucleo_firmware PUBLIC NUCLEO)
 # BlackPill STM32F411CE
-add_executable(blackpill_firmware.elf ${SOURCE_FILES})
+add_executable(blackpill_firmware ${SOURCE_FILES})
 
-target_compile_features(blackpill_firmware.elf  PUBLIC cxx_std_17)
+target_compile_features(blackpill_firmware  PUBLIC cxx_std_17)
 target_include_directories(
-    blackpill_firmware.elf
+    blackpill_firmware
     PUBLIC
     inc/
     libs/ros/
 )
-target_link_libraries(blackpill_firmware.elf 
+target_link_libraries(blackpill_firmware
     HAL::STM32::F4::RCC
     HAL::STM32::F4::TIM
     HAL::STM32::F4::TIMEx
@@ -62,4 +62,4 @@ target_link_libraries(blackpill_firmware.elf
     CMSIS::STM32::F411CE
     STM32::NoSys
 )
-target_compile_definitions(blackpill_firmware.elf PUBLIC BLACKPILL)
+target_compile_definitions(blackpill_firmware PUBLIC BLACKPILL)

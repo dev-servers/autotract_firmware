@@ -1,6 +1,6 @@
 #include <stepper.h>
 
-constexpr uint32_t STEPS_PER_ROT = 72000;
+constexpr uint32_t STEPS_PER_ROT = 72000 * 5;
 constexpr uint32_t STEPS_PER_DEGREE = STEPS_PER_ROT / 360;
 constexpr uint32_t channel_lut[5] = {TIM_CHANNEL_1, TIM_CHANNEL_2,
                                      TIM_CHANNEL_3, 0, TIM_CHANNEL_4};
